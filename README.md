@@ -38,8 +38,9 @@ RTF / streaming / concurrency benchmarks use `Qwen/Qwen3-TTS-12Hz-0.6B-Base`.
 UTMOS and TN accuracy evaluated on both 0.6B and 1.7B models.
 All test sentences are in **Korean** (~20–60 chars per sentence).
 
-### Real-Time Factor (RTF)
+### Per-Request RTF (Non-Streaming)
 
+Each request generates complete audio before returning. RTF = generation time / audio duration.
 RTF < 1.0 = faster than real-time.
 
 | Concurrency | RTF avg | RTF max | Status |
@@ -54,28 +55,18 @@ RTF < 1.0 = faster than real-time.
 
 **RTF < 1.0 up to 10 concurrent requests** on a single RTX 3090.
 
-### Streaming (40 Concurrent Channels)
+### Streaming Throughput
 
-40 concurrent streaming requests, long text (~50 chars/sentence):
+Audio streams back in chunks as they are generated (chunked PCM over HTTP).
+Throughput RTF = total wall time / total audio duration across all channels.
+TTFB = time to first audio chunk.
 
-| Metric | Value |
-|--------|-------|
-| Success rate | 40/40 |
-| Avg TTFB | 746ms |
-| P99 TTFB | 829ms |
-| Avg audio duration | 6.8s |
-| Wall time | 23.38s |
-| Total audio generated | 270.3s |
-| **Throughput RTF** | **0.086** |
-
-### Concurrency Scaling
-
-| Channels | Success | Wall Time | Throughput RTF | Avg TTFB |
-|----------|---------|-----------|----------------|----------|
-| 20 | 20/20 | 10.84s | 0.119 | 148ms |
-| 30 | 30/30 | 14.05s | 0.102 | 320ms |
-| 40 (short) | 40/40 | 9.86s | 0.079 | 656ms |
-| 40 (long) | 40/40 | 23.38s | 0.086 | 746ms |
+| Channels | Text Length | Success | Wall Time | Throughput RTF | Avg TTFB | P99 TTFB |
+|----------|------------|---------|-----------|----------------|----------|----------|
+| 20 | ~50 chars | 20/20 | 10.84s | 0.119 | 148ms | — |
+| 30 | ~50 chars | 30/30 | 14.05s | 0.102 | 320ms | — |
+| 40 | ~20 chars | 40/40 | 9.86s | 0.079 | 656ms | — |
+| 40 | ~50 chars | 40/40 | 23.38s | 0.086 | 746ms | 829ms |
 
 ### Audio Quality (UTMOS)
 
@@ -97,14 +88,6 @@ Evaluated with TTS → ASR (Zipformer) → Levenshtein similarity. 22 voices x 2
 |-------|---------|---------------|-------------------|
 | 1.7B-Base | 97.7% | 93.5% | 94.5%–100.0% (5.5%p range) |
 | 0.6B-Base | 93.2% | 77.2% | 80.3%–97.4% (17.1%p range) |
-
-### Multilingual (10 Concurrent)
-
-| Language | Success | Avg TTFB | RTF |
-|----------|---------|----------|-----|
-| Korean | 10/10 | 130ms | 0.119 |
-| English | 10/10 | 152ms | 0.124 |
-| Chinese | 10/10 | 130ms | 0.119 |
 
 ## Quick Start
 
