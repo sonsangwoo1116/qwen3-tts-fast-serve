@@ -38,10 +38,10 @@ RTF / streaming / concurrency benchmarks use `Qwen/Qwen3-TTS-12Hz-0.6B-Base`.
 UTMOS and TN accuracy evaluated on both 0.6B and 1.7B models.
 All test sentences are in **Korean** (~20–60 chars per sentence).
 
-### Per-Request RTF (Streaming)
+### Streaming (Real-time, Concurrent)
 
-RTF per individual request during concurrent streaming. RTF = request generation time / audio duration.
-RTF < 1.0 = faster than real-time.
+Audio chunks stream back as they are generated. Each request receives chunked PCM over HTTP in real-time.
+RTF = per-request generation time / audio duration. RTF < 1.0 = faster than real-time.
 
 | Concurrency | RTF avg | RTF max | Status |
 |-------------|---------|---------|--------|
@@ -55,13 +55,13 @@ RTF < 1.0 = faster than real-time.
 
 **RTF < 1.0 up to 10 concurrent requests** on a single RTX 3090.
 
-### Aggregate Throughput (Streaming)
+### Batch Processing (Throughput)
 
-Server-level throughput with concurrent streaming channels (chunked PCM over HTTP).
-Throughput RTF = total wall time / total audio duration across all channels.
-TTFB = time to first audio chunk.
+N requests processed together on GPU. All audio generated to completion, then returned.
+Throughput RTF = total wall time / total audio duration across all requests.
+TTFB = time to first complete response.
 
-| Channels | Text Length | Success | Wall Time | Throughput RTF | Avg TTFB | P99 TTFB |
+| Requests | Text Length | Success | Wall Time | Throughput RTF | Avg TTFB | P99 TTFB |
 |----------|------------|---------|-----------|----------------|----------|----------|
 | 20 | ~50 chars | 20/20 | 10.84s | 0.119 | 148ms | — |
 | 30 | ~50 chars | 30/30 | 14.05s | 0.102 | 320ms | — |
