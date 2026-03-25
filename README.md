@@ -36,6 +36,7 @@ All benchmarks on **single NVIDIA RTX 3090 (24GB)**.
 
 RTF / streaming / concurrency benchmarks use `Qwen/Qwen3-TTS-12Hz-0.6B-Base`.
 UTMOS and TN accuracy evaluated on both 0.6B and 1.7B models.
+All test sentences are in **Korean** (~20–60 chars per sentence).
 
 ### Real-Time Factor (RTF)
 
